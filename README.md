@@ -34,7 +34,7 @@ El proyecto separa el frontend desarrollado con Angular del backend construido c
 ## Estructura del proyecto
 
 ```text
-WebMovil-Taller2/
+WebMovil-Taller-3/
 ├── backend/
 │   ├── app/
 │   │   ├── main.py
