@@ -93,6 +93,7 @@
 .main-content {
   grid-column: 2 / 3;
   grid-row: 2;
+  min-width: 0;
 }
 
 .table-wrap {
@@ -205,4 +206,17 @@ table {
 
 .timeline-link:hover {
   color: #0969da; 
+}
+
+@media (max-width: 1100px) {
+  .page-grid { grid-template-columns: 240px minmax(0, 1fr); padding: 24px; gap: 24px; }
+  .page-actions { grid-column: 2 / 3; }
+  .right-sidebar { grid-column: 1 / -1; grid-row: auto; min-width: 0; }
+}
+
+@media (max-width: 768px) {
+  .page-grid { grid-template-columns: 1fr; padding: 16px; gap: 16px; }
+  .page-title, .page-actions, .sidebar-filters, .main-content, .right-sidebar { grid-column: 1; grid-row: auto; min-width: 0; }
+  .page-actions { justify-self: start; }
+  .table-wrap { max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 }
