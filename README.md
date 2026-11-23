@@ -1,6 +1,6 @@
 # ICPC Tracker
 
-**Taller 02 — Introducción al Desarrollo Web/Móvil**
+**Taller 03 — Introducción al Desarrollo Web/Móvil**
 
 ICPC Tracker es una aplicación web *full stack* para llevar un registro personal de problemas de programación competitiva de plataformas como Codeforces, LeetCode y CSES. Permite organizar los problemas registrados, consultar su estado y visualizar un resumen del progreso.
 
