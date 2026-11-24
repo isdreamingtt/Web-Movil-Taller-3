@@ -22,7 +22,7 @@ def copiar_campos(problema):
 def serializar_lista(lista_entrenamiento: ListaEntrenamiento) -> ListaEntrenamientoRespuesta:
     buffer_qr = BytesIO()
     qrcode.make(PREFIJO_QR + lista_entrenamiento.codigo, image_factory=SvgPathFillImage).save(buffer_qr)
-    qr = "data:image/svg+xml;base64," + base64.b64decode(buffer_qr.getvalue()).decode("ascii")
+    qr = "data:image/svg+xml;base64," + base64.b64encode(buffer_qr.getvalue()).decode("ascii")
     return ListaEntrenamientoRespuesta(
         codigo = lista_entrenamiento.codigo, nombre = lista_entrenamiento.nombre,
         descripcion = lista_entrenamiento.descripcion, autor = lista_entrenamiento.propietario.username,
@@ -48,7 +48,7 @@ def crear_lista(datos: ListaEntrenamientoCrear, db: Session = Depends(get_db),
                 usuario: User = Depends(get_current_user)):
     
     ids = list(dict.fromkeys(datos.ids_problemas))
-    problemas = db.query(Problem).filter(Problem.user_id == usuario.id, Problem.id.in_(ids).all())
+    problemas = db.query(Problem).filter(Problem.user_id == usuario.id, Problem.id.in_(ids)).all()
     porId = {problema.id: problema for problema in problemas}
     
     if len(porId) != len(ids):
@@ -73,7 +73,7 @@ def consultar_lista(codigo: str, db: Session = Depends(get_db), usuario: User = 
     return serializar_lista(obtener_lista_compartida(db, codigo))
     
 @router.post("/{codigo}/importar", response_model = ListaEntrenamientoImportacionRespuesta)
-def improtar_lista(codigo: str, datos: ListaEntrenamientoImportar, db: Session = Depends(get_db), usuario: User = Depends(get_current_user)):
+def importar_lista(codigo: str, datos: ListaEntrenamientoImportar, db: Session = Depends(get_db), usuario: User = Depends(get_current_user)):
     lista_entrenamiento = obtener_lista_compartida(db, codigo)
     porId = {problema.id: problema for problema in lista_entrenamiento.problemas}
     ids = list(dict.fromkeys(datos.ids_problemas))
@@ -83,7 +83,7 @@ def improtar_lista(codigo: str, datos: ListaEntrenamientoImportar, db: Session =
     
     db.query(User).filter_by(id = usuario.id).with_for_update().one()
     existentes = db.query(Problem).filter_by(user_id = usuario.id).all()
-    improtados = omitidos = 0
+    importados = omitidos = 0
     
     for i in ids:
         origen = porId[i]
@@ -97,7 +97,7 @@ def improtar_lista(codigo: str, datos: ListaEntrenamientoImportar, db: Session =
         importados += 1
     
     db.commit()
-    return ListaEntrenamientoImportacionRespuesta(importado = importados, omitidos = omitidos)
+    return ListaEntrenamientoImportacionRespuesta(importados = importados, omitidos = omitidos)
 
 @router.delete("/{codigo}", status_code = 204)
 def eliminar_lista(codigo: str, db: Session = Depends(get_db), usuario: User = Depends(get_current_user)):
