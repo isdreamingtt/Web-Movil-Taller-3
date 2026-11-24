@@ -11,7 +11,9 @@ import { ProblemsService } from '../services/problems.service';
 import { ESTADOS, PLATAFORMAS, Problem, ProblemInput } from '../models/problem';
 import { ProblemFormDialog } from '../components/problem-form-dialog';
 import { ConfirmDialog } from '../components/confirm-dialog';
-import { computed } from '@angular/core'; 
+import { computed } from '@angular/core';
+import { Router } from '@angular/router';
+import { RetosAleatoriosDialog, ResultadoRetos } from '../components/retos-aleatorios-dialog';
 
 @Component({
   selector: 'app-problems-page',
@@ -31,6 +33,9 @@ import { computed } from '@angular/core';
 
       <!-- Arriba a la derecha: Botón Agregar -->
       <div class="page-actions">
+        <button mat-stroked-button (click)="abrirRetosAleatorios()">
+          <mat-icon>shuffle</mat-icon> Retos aleatorios
+        </button>
         <button mat-flat-button color="primary" (click)="openForm()">
           <mat-icon>add</mat-icon> Agregar
         </button>
@@ -199,6 +204,7 @@ export class ProblemsPage {
   private service = inject(ProblemsService);
   private dialog = inject(MatDialog);
   private snack = inject(MatSnackBar);
+  private router = inject(Router);
 
   plataforma = signal('');
   estado = signal('');
@@ -229,10 +235,22 @@ export class ProblemsPage {
     }));
   });
 
-  openForm(problem?: Problem) {
-    this.dialog
-      .open(ProblemFormDialog, { data: problem ?? null })
-      .afterClosed()
+  abrirRetosAleatorios() {
+    this.dialog.open<RetosAleatoriosDialog, void, ResultadoRetos>(RetosAleatoriosDialog, {
+      width: '420px', maxWidth: 'calc(100vw - 32px)',
+    }).afterClosed().subscribe(resultado => {
+      this.problems.reload();
+      if (resultado?.accion === 'agregar') this.openForm();
+      if (resultado?.accion === 'listas') void this.router.navigate(['/listas']);
+      if (resultado?.accion === 'resolver') this.openForm(resultado.problema, true);
+    });
+  }
+
+  openForm(problem?: Problem, resolver = false) {
+    const referencia = this.dialog.open(ProblemFormDialog, { data: problem ?? null });
+    // Se usa el formulario común de edición: aquí se integrará también el GPS.
+    if (resolver && problem) referencia.componentInstance.form.controls.estado.setValue('Resuelto');
+    referencia.afterClosed()
       .subscribe((value?: ProblemInput) => {
         if (!value) return;
         const request$ = problem

@@ -1,0 +1,14 @@
+.centrado { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px; }
+.centrado h3, .centrado p { margin: 0; }
+.icono-grande { width: 56px; height: 56px; font-size: 56px; color: #075de1; }
+.contador { color: #596579; font-size: 13px; }
+.aviso { font-size: 13px; color: #475569; }
+.tarjeta-reto { background: #f4f7fc; border: 1px solid #dce5f2; border-radius: 12px; padding: 16px; margin: 16px 0; overflow-wrap: anywhere; }
+.tarjeta-reto h3 { margin: 0 0 12px; color: #082b51; }
+dl { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px 12px; margin: 0; }
+dt { color: #475569; }
+dd { margin: 0; font-weight: 600; text-align: right; }
+.acciones-reto { display: flex; flex-direction: column; gap: 10px; }
+.aceptado { color: #17683d; font-weight: 500; margin: 0; }
+.boton-sorteo { width: 100%; margin-top: 16px; }
+.error { color: var(--mat-sys-error, #b00020); }

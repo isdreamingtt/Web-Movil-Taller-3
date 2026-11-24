@@ -1,0 +1,68 @@
+<h2 mat-dialog-title>Retos aleatorios</h2>
+<mat-dialog-content>
+  @if (problemas.isLoading() && !reto()) {
+    <div class="centrado"><mat-spinner diameter="36" aria-label="Cargando problemas" /></div>
+  } @else if (problemas.error()) {
+    <p role="alert">No se pudieron cargar tus problemas.</p>
+    <button mat-stroked-button (click)="problemas.reload()">Reintentar</button>
+  } @else if (!disponibles().length && !reto()) {
+    <div class="centrado">
+      <mat-icon class="icono-grande">assignment_late</mat-icon>
+      <h3>No tienes problemas pendientes o intentando</h3>
+      <p>Agrega un problema o importa una lista de entrenamiento mediante QR.</p>
+      <button mat-flat-button (click)="salir('agregar')">Agregar problema</button>
+      <button mat-stroked-button (click)="salir('listas')">Ir a Listas QR</button>
+    </div>
+  } @else {
+    <div class="centrado">
+      <mat-icon class="icono-grande">{{ reto() ? 'emoji_events' : 'vibration' }}</mat-icon>
+      <h3>{{ reto() ? '¡Reto encontrado!' : '¡Agita tu teléfono!' }}</h3>
+      <p>Descubre tu próximo desafío de programación.</p>
+      <p class="contador">{{ disponibles().length }} problemas disponibles</p>
+    </div>
+    @switch (sensor.estado()) {
+      @case ('permiso') {
+        <p>Permite el acceso al sensor de movimiento para sortear agitando el teléfono.</p>
+        <button mat-stroked-button (click)="activarSensor()">Activar sensor</button>
+      }
+      @case ('comprobando') { <p class="aviso" role="status">Comprobando el acelerómetro…</p> }
+      @case ('activo') { <p class="aviso" role="status">Sensor activo. Agita el teléfono para sortear.</p> }
+      @case ('rechazado') { <p class="aviso" role="status">Permiso rechazado. Puedes usar el sorteo manual.</p> }
+      @case ('no-disponible') { <p class="aviso" role="status">No se reciben datos del acelerómetro. Usa el sorteo manual.</p> }
+      @case ('error') { <p class="aviso" role="status">No se pudo activar el sensor. Usa el sorteo manual.</p> }
+    }
+    @if (reto(); as problema) {
+      <section class="tarjeta-reto" aria-live="polite">
+        <h3>{{ problema.titulo }}</h3>
+        <dl>
+          <dt>Plataforma</dt><dd>{{ problema.plataforma }}</dd>
+          <dt>Dificultad</dt><dd>{{ problema.dificultad ?? 'Sin especificar' }}</dd>
+          <dt>Tag</dt><dd>{{ problema.tag || 'Sin especificar' }}</dd>
+          <dt>Estado</dt><dd>{{ problema.estado }}</dd>
+        </dl>
+      </section>
+      <div class="acciones-reto">
+        @if (!aceptado()) {
+          <button mat-flat-button [disabled]="guardando()" (click)="aceptar()">
+            {{ guardando() ? 'Guardando…' : 'Aceptar reto' }}
+          </button>
+        } @else {
+          <p class="aceptado" role="status">¡Reto aceptado! Está registrado como Intentando.</p>
+          <button mat-flat-button (click)="resolver()"><mat-icon>check_circle</mat-icon> Marcar como resuelto</button>
+        }
+        @if (urlReto(); as url) {
+          <a mat-stroked-button [href]="url" target="_blank" rel="noopener noreferrer"><mat-icon>open_in_new</mat-icon> Abrir problema</a>
+        } @else {
+          <p class="aviso">Este problema no tiene una URL válida.</p>
+        }
+      </div>
+    }
+    <button class="boton-sorteo" mat-stroked-button [disabled]="guardando() || problemas.isLoading() || !disponibles().length" (click)="sortear(true)">
+      <mat-icon>shuffle</mat-icon> {{ reto() ? 'Sortear otro reto' : 'Sortear reto' }}
+    </button>
+  }
+  @if (error()) { <p class="error" role="alert">{{ error() }}</p> }
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close [disabled]="guardando()">Cerrar</button>
+</mat-dialog-actions>

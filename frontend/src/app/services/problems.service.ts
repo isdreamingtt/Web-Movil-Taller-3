@@ -22,6 +22,10 @@ export class ProblemsService {
     return httpResource<string[]>(() => `${API_URL}/problems/tags`);
   }
 
+  obtenerPorId(id: number) {
+    return this.http.get<Problem>(`${API_URL}/problems/${id}`);
+  }
+
   create(data: ProblemInput) {
     return this.http.post<Problem>(`${API_URL}/problems`, data);
   }
