@@ -41,3 +41,33 @@ class ProblemUpdate(ProblemBase):
 class ProblemOut(ProblemBase):
     id: int
     model_config = ConfigDict(from_attributes=True)
+    
+class ListaEntrenamientoCrear(BaseModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
+    nombre: str = Field(min_length=1, max_length=100)
+    descripcion: Optional[str] = Field(default=None, max_length=500)
+    ids_problemas: list[int] = Field(min_length=1, max_length=100)
+
+class ProblemaListaEntrenamientoRespuesta(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+    titulo: str
+    plataforma: str
+    dificultad: Optional[int]
+    url: Optional[str]
+    tag: Optional[str]
+
+class ListaEntrenamientoRespuesta(BaseModel):
+    codigo: str
+    nombre: str
+    descripcion: Optional[str]
+    autor: str
+    problemas: list[ProblemaListaEntrenamientoRespuesta]
+    url_datos_qr: str
+
+class ListaEntrenamientoImportar(BaseModel):
+    ids_problemas: list[int] = Field(min_length=1, max_length=100)
+
+class ListaEntrenamientoImportacionRespuesta(BaseModel):
+    importados: int
+    omitidos: int

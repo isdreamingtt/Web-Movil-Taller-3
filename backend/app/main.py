@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.database.database import Base, engine
 from app.models import models  # noqa: F401  (registra las tablas)
-from app.routers import auth, problems
+from app.routers import auth, problems, listas_entrenamiento
 
 DEFAULT_CORS_ORIGINS = (
     "http://localhost:4200,"
@@ -47,3 +47,4 @@ def health():
 
 app.include_router(auth.router)
 app.include_router(problems.router)
+app.include_router(listas_entrenamiento.router)

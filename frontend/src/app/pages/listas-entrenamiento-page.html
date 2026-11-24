@@ -1,0 +1,94 @@
+<main class="pagina-entrenamiento">
+  <header>
+    <h1>Listas de entrenamiento</h1>
+    <p>Comparte problemas de programación competitiva con tu equipo mediante QR.</p>
+  </header>
+  @if (error()) { <p role="alert" class="retroalimentacion error">{{ error() }}</p> }
+  @if (mensaje()) {
+    <p role="status" class="retroalimentacion exito">{{ mensaje() }} <a routerLink="/problemas">Ver mis problemas</a></p>
+  }
+  <div class="cuadricula-entrenamiento">
+    <section class="panel">
+      <h2>Crear lista</h2>
+      <label for="nombre">Nombre de la lista</label>
+      <input id="nombre" [(ngModel)]="nombre" maxlength="100" placeholder="Ej.: Algoritmos de grafos" />
+      <label for="descripcion">Descripción (opcional)</label>
+      <textarea id="descripcion" [(ngModel)]="descripcion" maxlength="500" rows="3" placeholder="Objetivo del entrenamiento"></textarea>
+      <div class="cabecera-seleccion">
+        <h3>Mis problemas ({{ seleccionados().length }})</h3>
+        <button mat-button type="button" (click)="seleccionados.set([])" [disabled]="ocupado() || !seleccionados().length">Limpiar</button>
+      </div>
+      @if (problemas.isLoading()) { <p>Cargando problemas…</p> }
+      @else if (problemas.error()) { <p>No se pudieron cargar los problemas.</p><button mat-button (click)="problemas.reload()">Reintentar</button> }
+      @else if (!problemas.value()?.length) { <p>Aún no tienes problemas. <a routerLink="/problemas">Agrega uno primero.</a></p> }
+      @else {
+        <div class="lista-problemas">
+          @for (p of problemas.value() ?? []; track p.id) {
+            <mat-checkbox [checked]="seleccionados().includes(p.id)" [disabled]="ocupado() || (!seleccionados().includes(p.id) && seleccionados().length >= 100)" (change)="alternarSeleccion(seleccionados, p.id, $event.checked)">
+              <span class="titulo-problema">{{ p.titulo }}</span>
+              <small>{{ p.plataforma }} · {{ p.tag || 'Sin etiqueta' }} · {{ p.dificultad ?? 'Sin dificultad' }}</small>
+            </mat-checkbox>
+          }
+        </div>
+      }
+      <button mat-flat-button class="accion-principal" (click)="crear()" [disabled]="ocupado() || !nombre.trim() || !seleccionados().length"><mat-icon>qr_code</mat-icon> Crear lista y QR</button>
+    </section>
+    <section class="panel">
+      <h2>Importar lista</h2>
+      <p>Escanea el QR de otro usuario para consultar su selección de problemas.</p>
+      <button mat-flat-button (click)="escanear()" [disabled]="ocupado() || !escaner.disponible"><mat-icon>qr_code_scanner</mat-icon> Escanear QR</button>
+      @if (!escaner.disponible) { <small>La cámara se utiliza desde la aplicación Android. En la web puedes usar el código manual.</small> }
+      <label for="codigo">Código de lista</label>
+      <div class="fila-codigo">
+        <input id="codigo" [(ngModel)]="codigo" placeholder="Código o contenido del QR" (keyup.enter)="consultar()" />
+        <button mat-stroked-button (click)="consultar()" [disabled]="ocupado() || !codigo.trim()">Consultar</button>
+      </div>
+      @if (vistaPrevia(); as lista) {
+        <div class="vista-previa">
+          <h3>{{ lista.nombre }}</h3>
+          <p>Compartida por {{ lista.autor }} · {{ lista.problemas.length }} problemas</p>
+          @if (lista.descripcion) { <p>{{ lista.descripcion }}</p> }
+          <div class="cabecera-seleccion">
+            <span>{{ porImportar().length }} seleccionados</span>
+            <button mat-button (click)="alternarTodos(lista)" [disabled]="ocupado()">{{ porImportar().length === lista.problemas.length ? 'Ninguno' : 'Todos' }}</button>
+          </div>
+          <div class="lista-problemas">
+            @for (p of lista.problemas; track p.id) {
+              <mat-checkbox [checked]="porImportar().includes(p.id)" (change)="alternarSeleccion(porImportar, p.id, $event.checked)" [disabled]="ocupado()">
+                <span class="titulo-problema">{{ p.titulo }}</span>
+                <small>{{ p.plataforma }} · {{ p.tag || 'Sin etiqueta' }} · {{ p.dificultad ?? 'Sin dificultad' }}</small>
+              </mat-checkbox>
+            }
+          </div>
+          <p class="ayuda">Los problemas nuevos se agregarán como Pendiente. Los duplicados no se modificarán.</p>
+          <button mat-flat-button (click)="importarSeleccion()" [disabled]="ocupado() || !porImportar().length">Importar selección</button>
+        </div>
+      }
+    </section>
+    @if (listaActiva(); as lista) {
+      <section class="panel panel-qr">
+        <h2>{{ lista.nombre }}</h2>
+        <p>{{ lista.problemas.length }} problemas · Comparte este código</p>
+        <img [src]="lista.url_datos_qr" alt="Código QR de la lista de entrenamiento" width="240" height="240" />
+        <label for="codigo-compartir">Código manual</label>
+        <input id="codigo-compartir" [value]="lista.codigo" readonly (focus)="$any($event.target).select()" />
+        <p class="ayuda">Cualquier usuario autenticado que tenga este código puede consultar e importar la lista.</p>
+        <button mat-button (click)="listaActiva.set(null)">Cerrar QR</button>
+      </section>
+    }
+    <section class="panel">
+      <h2>Mis listas compartidas</h2>
+      @if (cargando()) { <p>Cargando listas…</p> }
+      @else if (errorListas()) { <p role="alert">{{ errorListas() }}</p><button mat-button (click)="cargarListas()">Reintentar</button> }
+      @else if (!listas().length) { <p>Aún no has creado listas.</p> }
+      @for (lista of listas(); track lista.codigo) {
+        <div class="lista-guardada">
+          <div><strong>{{ lista.nombre }}</strong><small>{{ lista.problemas.length }} problemas</small></div>
+          <button mat-button (click)="listaActiva.set(lista)" [disabled]="ocupado()">Ver QR</button>
+          <button mat-icon-button aria-label="Eliminar lista" (click)="eliminar(lista)" [disabled]="ocupado()"><mat-icon>delete</mat-icon></button>
+        </div>
+      }
+    </section>
+
+  </div>
+</main>

@@ -1,0 +1,26 @@
+:host { display: block; color: #10234b; }
+.pagina-entrenamiento { max-width: 1100px; padding: 28px clamp(16px, 4vw, 48px); margin: auto; }
+h1 { margin: 0; font-size: clamp(24px, 4vw, 32px); }
+h2 { margin: 0 0 12px; font-size: 20px; }
+h3 { margin: 0; font-size: 16px; }
+p { line-height: 1.5; margin: 8px 0; }
+.cuadricula-entrenamiento { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; margin-top: 24px; align-items: start; }
+.panel { display: flex; flex-direction: column; gap: 10px; padding: 22px; border: 1px solid #d8e4ff; border-radius: 14px; background: #fff; box-shadow: 0 3px 12px #10234b0a; min-width: 0; }
+label { font-weight: 600; font-size: 14px; }
+input, textarea { box-sizing: border-box; width: 100%; min-width: 0; padding: 12px; border: 1px solid #b6caeb; border-radius: 8px; font: inherit; color: inherit; }
+textarea { resize: vertical; }
+.cabecera-seleccion, .lista-guardada, .fila-codigo { display: flex; gap: 8px; align-items: center; justify-content: space-between; }
+.lista-problemas { display: flex; flex-direction: column; max-height: 320px; overflow: auto; border: 1px solid #d8e4ff; border-radius: 8px; padding: 8px; }
+.titulo-problema, small { display: block; overflow-wrap: anywhere; white-space: normal; }
+small, .ayuda { color: #435575; font-size: 13px; }
+mat-checkbox { margin: 4px 0; }
+.accion-principal { margin-top: 6px; }
+.vista-previa { border-top: 1px solid #d8e4ff; padding-top: 16px; }
+.vista-previa > button { margin-top: 8px; }
+.lista-guardada { border-top: 1px solid #d8e4ff; padding-top: 12px; }
+.lista-guardada > div { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.panel-qr img { display: block; width: min(240px, 100%); height: auto; align-self: center; background: white; }
+.retroalimentacion { padding: 12px; border-radius: 8px; }
+.error { background: #fff1f1; color: #9b2020; }
+.exito { background: #edf8f0; color: #205c33; }
+@media (max-width: 720px) { .cuadricula-entrenamiento { grid-template-columns: 1fr; } .panel { padding: 16px; } }

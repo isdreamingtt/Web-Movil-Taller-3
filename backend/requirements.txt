@@ -6,3 +6,4 @@ pydantic[email]
 python-dotenv
 bcrypt
 PyJWT
+qrcode==8.2

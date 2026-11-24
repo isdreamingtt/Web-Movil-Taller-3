@@ -18,6 +18,7 @@ import { AuthService } from './services/auth.service';
       <nav class="site-nav" aria-label="Navegación principal">
         @if (auth.isLoggedIn()) {
           <a class="nav-link" routerLink="/problemas" routerLinkActive="active" ariaCurrentWhenActive="page">Problemas</a>
+          <a class="nav-link" routerLink="/listas" routerLinkActive="active" ariaCurrentWhenActive="page">Listas QR</a>
           <a class="nav-link" routerLink="/estadisticas" routerLinkActive="active" ariaCurrentWhenActive="page">Estadísticas</a>
           <a class="nav-link" [routerLink]="['/perfil']" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">{{ auth.username() }}</a>
           <button class="logout-link" type="button" (click)="auth.logout()">Salir</button>

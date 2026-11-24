@@ -33,3 +33,11 @@
   .site-brand-mark { width: 32px; height: 32px; font-size: 14px; }
   .site-nav { gap: 9px; }
 }
+@media (max-width: 900px) {
+  .site-header { flex-wrap: wrap; }
+  .site-nav { flex-wrap: wrap; gap: 6px 14px; }
+}
+@media (max-width: 600px) {
+  .site-nav { width: 100%; }
+  .nav-link, .logout-link { min-height: 36px; }
+}
