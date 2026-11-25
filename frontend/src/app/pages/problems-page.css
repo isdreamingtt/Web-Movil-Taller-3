@@ -1,15 +1,12 @@
-/* Layout principal */
 .page-grid {
   display: grid;
-  /* Columna 1: Filtros (260px), Columna 2: Tabla (fluido), Columna 3: Espacio vacío derecha (15vw) */
   grid-template-columns: 260px minmax(400px, 1fr) 15vw;
   grid-template-rows: auto 1fr;
   gap: 32px;
-  padding: 32px 48px; /* Ajusta el 48px si lo quieres aún más pegado al borde */
-  max-width: 100%; /* Permite que se expanda a toda la pantalla */
+  padding: 32px 48px;
+  max-width: 100%;
 }
 
-/* Título */
 .page-title {
   grid-column: 1 / 2;
   grid-row: 1;
@@ -18,7 +15,6 @@
   font-size: 24px;
 }
 
-/* Botón Agregar */
 .page-actions {
   grid-column: 2 / 4;
   grid-row: 1;
@@ -29,7 +25,6 @@
   align-self: center;
 }
 
-/* Contenedor de filtros */
 .sidebar-filters {
   grid-column: 1 / 2;
   grid-row: 2;
@@ -38,7 +33,6 @@
   gap: 20px;
 }
 
-/* Estilos de cada sección de filtro */
 .filter-section {
   display: flex;
   flex-direction: column;
@@ -55,7 +49,7 @@
 .filter-header h3 {
   margin: 0;
   font-size: 16px;
-  font-weight: 800; /* Texto en negrita como en la foto */
+  font-weight: 800;
   color: #1a1f36;
 }
 
@@ -65,17 +59,15 @@
   gap: 8px;
 }
 
-/* Ajuste del checkbox para que coincida con la imagen */
 ::ng-deep .filter-options .mdc-form-field {
   font-size: 14px !important;
   color: #3b4252 !important;
 }
 
 ::ng-deep .filter-options .mdc-checkbox {
-  padding-left: 0 !important; /* Alinea la caja a la izquierda */
+  padding-left: 0 !important;
 }
 
-/* Botón amarillo estilo "Aplicar" de la imagen */
 .btn-yellow {
   background-color: #fce35a;
   color: #1a1f36;
@@ -92,7 +84,6 @@
   background-color: #f7d620;
 }
 
-/* Tabla central */
 .main-content {
   grid-column: 2 / 3;
   grid-row: 2;
@@ -109,6 +100,25 @@ table {
   width: 100%;
 }
 
+.solved-date {
+  font-size: 11px;
+  color: #6b7280;
+}
+
+.location-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+}
+
+.loc-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  color: #075de1;
+}
+
 .actions-cell {
   white-space: nowrap;
   text-align: right;
@@ -123,10 +133,9 @@ table {
 .right-sidebar {
   grid-column: 3 / 4;
   grid-row: 2;
-  min-width: 250px; 
+  min-width: 250px;
 }
 
-/* Tarjeta del widget */
 .timeline-widget {
   background: white;
   border-radius: 8px;
@@ -142,7 +151,6 @@ table {
   color: #1a1f36;
 }
 
-/* Contenedor principal de la línea */
 .timeline {
   position: relative;
   padding-left: 12px;
@@ -167,18 +175,16 @@ table {
   margin-bottom: 0;
 }
 
-
 .timeline-dot {
   position: absolute;
-  left: -13.5px; 
+  left: -13.5px;
   top: 4px;
   width: 9px;
   height: 9px;
   border-radius: 50%;
-  background-color: #075de1; 
-  border: 2px solid #075de1; 
+  background-color: #075de1;
+  border: 2px solid #075de1;
 }
-
 
 .timeline-content {
   padding-left: 12px;
@@ -198,6 +204,15 @@ table {
   line-height: 1.4;
 }
 
+.timeline-location {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: #4b5563;
+}
+
 .timeline-link {
   display: inline-block;
   margin-top: 20px;
@@ -208,18 +223,46 @@ table {
 }
 
 .timeline-link:hover {
-  color: #0969da; 
+  color: #0969da;
 }
 
 @media (max-width: 1100px) {
-  .page-grid { grid-template-columns: 240px minmax(0, 1fr); padding: 24px; gap: 24px; }
-  .page-actions { grid-column: 2 / 3; }
-  .right-sidebar { grid-column: 1 / -1; grid-row: auto; min-width: 0; }
+  .page-grid {
+    grid-template-columns: 240px minmax(0, 1fr);
+    padding: 24px;
+    gap: 24px;
+  }
+  .page-actions {
+    grid-column: 2 / 3;
+  }
+  .right-sidebar {
+    grid-column: 1 / -1;
+    grid-row: auto;
+    min-width: 0;
+  }
 }
 
 @media (max-width: 768px) {
-  .page-grid { grid-template-columns: 1fr; padding: 16px; gap: 16px; }
-  .page-title, .page-actions, .sidebar-filters, .main-content, .right-sidebar { grid-column: 1; grid-row: auto; min-width: 0; }
-  .page-actions { justify-self: start; }
-  .table-wrap { max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .page-grid {
+    grid-template-columns: 1fr;
+    padding: 16px;
+    gap: 16px;
+  }
+  .page-title,
+  .page-actions,
+  .sidebar-filters,
+  .main-content,
+  .right-sidebar {
+    grid-column: 1;
+    grid-row: auto;
+    min-width: 0;
+  }
+  .page-actions {
+    justify-self: start;
+  }
+  .table-wrap {
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
 }

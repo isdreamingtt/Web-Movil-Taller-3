@@ -2,19 +2,20 @@ import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { catchError, throwError } from 'rxjs';
 import { AuthService } from '../services/auth.service';
+import { API_URL } from '../services/api.config';
 
-// Interceptor HTTP que adjunta el token JWT en cada petición y cierra sesión ante un 401
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const auth = inject(AuthService);
   const token = auth.token();
+  const isApiRequest = req.url.startsWith(API_URL);
 
-  if (token) {
+  if (token && isApiRequest) {
     req = req.clone({ setHeaders: { Authorization: `Bearer ${token}` } });
   }
 
   return next(req).pipe(
     catchError((err) => {
-      if (err.status === 401 && token) auth.logout(); // token vencido o inválido
+      if (err.status === 401 && token && isApiRequest) auth.logout();
       return throwError(() => err);
     }),
   );

@@ -1,37 +1,33 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatExpansionModule } from '@angular/material/expansion'; // <-- IMPORTANTE: Nuevo módulo
+import { MatExpansionModule } from '@angular/material/expansion';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { Router } from '@angular/router';
 import { ProblemsService } from '../services/problems.service';
 import { ESTADOS, PLATAFORMAS, Problem, ProblemInput } from '../models/problem';
 import { ProblemFormDialog } from '../components/problem-form-dialog';
 import { ConfirmDialog } from '../components/confirm-dialog';
-import { computed } from '@angular/core';
-import { Router } from '@angular/router';
 import { RetosAleatoriosDialog, ResultadoRetos } from '../components/retos-aleatorios-dialog';
 
 @Component({
   selector: 'app-problems-page',
   imports: [
-    MatTableModule, 
-    MatButtonModule, 
-    MatIconModule, 
-    MatCheckboxModule, 
-    MatExpansionModule, 
+    MatTableModule,
+    MatButtonModule,
+    MatIconModule,
+    MatCheckboxModule,
+    MatExpansionModule,
     MatProgressSpinnerModule,
   ],
   template: `
     <div class="page-grid">
-      
-      <!-- Arriba a la izquierda: Título -->
       <h1 class="page-title">Mis problemas</h1>
 
-      <!-- Arriba a la derecha: Botón Agregar -->
       <div class="page-actions">
         <button mat-stroked-button (click)="abrirRetosAleatorios()">
           <mat-icon>shuffle</mat-icon> Retos aleatorios
@@ -41,85 +37,74 @@ import { RetosAleatoriosDialog, ResultadoRetos } from '../components/retos-aleat
         </button>
       </div>
 
-      <!-- Izquierda: Filtros estilo Acordeón -->
       <aside class="sidebar-filters">
-        
-        <!-- mat-accordion gestiona que solo 1 panel esté abierto a la vez -->
         <mat-accordion>
-          
-          <!-- Sección Plataforma (abierta por defecto) -->
           <mat-expansion-panel expanded="true" class="custom-panel">
             <mat-expansion-panel-header>
               <mat-panel-title class="filter-title">Plataforma</mat-panel-title>
             </mat-expansion-panel-header>
             <div class="filter-options">
-              <mat-checkbox 
-                [checked]="plataforma() === ''" 
+              <mat-checkbox
+                [checked]="plataforma() === ''"
                 (change)="$event.checked ? plataforma.set('') : null">
                 Todas
               </mat-checkbox>
-              @for (p of plataformas; track p) { 
-                <mat-checkbox 
-                  [checked]="plataforma() === p" 
+              @for (p of plataformas; track p) {
+                <mat-checkbox
+                  [checked]="plataforma() === p"
                   (change)="$event.checked ? plataforma.set(p) : plataforma.set('')">
                   {{ p }}
-                </mat-checkbox> 
+                </mat-checkbox>
               }
             </div>
           </mat-expansion-panel>
 
-          <!-- Sección Estado -->
           <mat-expansion-panel class="custom-panel">
             <mat-expansion-panel-header>
               <mat-panel-title class="filter-title">Estado</mat-panel-title>
             </mat-expansion-panel-header>
             <div class="filter-options">
-              <mat-checkbox 
-                [checked]="estado() === ''" 
+              <mat-checkbox
+                [checked]="estado() === ''"
                 (change)="$event.checked ? estado.set('') : null">
                 Todos
               </mat-checkbox>
-              @for (e of estados; track e) { 
-                <mat-checkbox 
-                  [checked]="estado() === e" 
+              @for (e of estados; track e) {
+                <mat-checkbox
+                  [checked]="estado() === e"
                   (change)="$event.checked ? estado.set(e) : estado.set('')">
                   {{ e }}
-                </mat-checkbox> 
+                </mat-checkbox>
               }
             </div>
           </mat-expansion-panel>
 
-          <!-- Sección Tag -->
           <mat-expansion-panel class="custom-panel">
             <mat-expansion-panel-header>
               <mat-panel-title class="filter-title">Tag</mat-panel-title>
             </mat-expansion-panel-header>
             <div class="filter-options">
-              <mat-checkbox 
-                [checked]="tag() === ''" 
+              <mat-checkbox
+                [checked]="tag() === ''"
                 (change)="$event.checked ? tag.set('') : null">
                 Todos
               </mat-checkbox>
-              @for (t of tags.value() ?? []; track t) { 
-                <mat-checkbox 
-                  [checked]="tag() === t" 
+              @for (t of tags.value() ?? []; track t) {
+                <mat-checkbox
+                  [checked]="tag() === t"
                   (change)="$event.checked ? tag.set(t) : tag.set('')">
                   {{ t }}
-                </mat-checkbox> 
+                </mat-checkbox>
               }
             </div>
           </mat-expansion-panel>
-
         </mat-accordion>
 
-        <!-- Botón Limpiar -->
         <button class="btn-yellow" (click)="plataforma.set(''); estado.set(''); tag.set('')">
           Limpiar filtros
         </button>
-
       </aside>
 
-      <!-- Centro: Tabla de problemas -->
       <main class="main-content">
         @if (problems.isLoading()) {
           <div class="center"><mat-spinner diameter="40" /></div>
@@ -137,27 +122,46 @@ import { RetosAleatoriosDialog, ResultadoRetos } from '../components/retos-aleat
                   @else { <span>{{ p.titulo }}</span> }
                 </td>
               </ng-container>
-              
+
               <ng-container matColumnDef="plataforma">
                 <th mat-header-cell *matHeaderCellDef>Plataforma</th>
                 <td mat-cell *matCellDef="let p">{{ p.plataforma }}</td>
               </ng-container>
-              
+
               <ng-container matColumnDef="dificultad">
                 <th mat-header-cell *matHeaderCellDef>Dificultad</th>
                 <td mat-cell *matCellDef="let p">{{ p.dificultad ?? '-' }}</td>
               </ng-container>
-              
+
               <ng-container matColumnDef="tag">
                 <th mat-header-cell *matHeaderCellDef>Tag</th>
                 <td mat-cell *matCellDef="let p">{{ p.tag ?? '-' }}</td>
               </ng-container>
-              
+
               <ng-container matColumnDef="estado">
                 <th mat-header-cell *matHeaderCellDef>Estado</th>
-                <td mat-cell *matCellDef="let p">{{ p.estado }}</td>
+                <td mat-cell *matCellDef="let p">
+                  <div>{{ p.estado }}</div>
+                  @if (p.estado === 'Resuelto' && p.solved_at) {
+                    <div class="solved-date">{{ formatDate(p.solved_at) }}</div>
+                  }
+                </td>
               </ng-container>
-              
+
+              <ng-container matColumnDef="ubicacion">
+                <th mat-header-cell *matHeaderCellDef>Ubicación</th>
+                <td mat-cell *matCellDef="let p">
+                  @if (p.solved_location) {
+                    <span class="location-cell">
+                      <mat-icon class="loc-icon">location_on</mat-icon>
+                      <span>{{ p.solved_location }}</span>
+                    </span>
+                  } @else {
+                    <span>-</span>
+                  }
+                </td>
+              </ng-container>
+
               <ng-container matColumnDef="acciones">
                 <th mat-header-cell *matHeaderCellDef></th>
                 <td mat-cell *matCellDef="let p" class="actions-cell">
@@ -173,32 +177,36 @@ import { RetosAleatoriosDialog, ResultadoRetos } from '../components/retos-aleat
         }
       </main>
 
-      <!-- Derecha: Historial Timeline tipo GitHub) -->
       <aside class="right-sidebar">
         <div class="timeline-widget">
           <h3 class="timeline-header">Actividad reciente</h3>
-          
+
           <div class="timeline">
-            @for (act of actividadReciente(); track act.titulo) {
+            @for (act of actividadReciente(); track act.id) {
               <div class="timeline-item">
                 <div class="timeline-dot"></div>
                 <div class="timeline-content">
                   <span class="timeline-time">{{ act.tiempo }}</span>
                   <p class="timeline-text">
-                    Resuelto: <strong>{{ act.titulo }}</strong> en {{ act.plataforma }}
+                    {{ act.accion }}: <strong>{{ act.titulo }}</strong> en {{ act.plataforma }}
                   </p>
+                  @if (act.ubicacion) {
+                    <p class="timeline-location">
+                      <mat-icon class="loc-icon">location_on</mat-icon>
+                      {{ act.ubicacion }}
+                    </p>
+                  }
                 </div>
               </div>
             }
           </div>
-          
+
           <a href="#" class="timeline-link">Ver todo el historial &rarr;</a>
         </div>
       </aside>
-
     </div>
   `,
-  styleUrl: './problems-page.css'
+  styleUrl: './problems-page.css',
 })
 export class ProblemsPage {
   private service = inject(ProblemsService);
@@ -212,7 +220,7 @@ export class ProblemsPage {
 
   plataformas = PLATAFORMAS;
   estados = ESTADOS;
-  columns = ['titulo', 'plataforma', 'dificultad', 'tag', 'estado', 'acciones'];
+  columns = ['titulo', 'plataforma', 'dificultad', 'tag', 'estado', 'ubicacion', 'acciones'];
 
   problems = this.service.listResource(() => ({
     plataforma: this.plataforma(),
@@ -223,48 +231,71 @@ export class ProblemsPage {
 
   actividadReciente = computed(() => {
     const todosLosProblemas = this.problems.value() ?? [];
-    
-    // Hacemos una copia, invertimos el orden para ver los últimos creados y tomamos solo 5
     const ultimos = [...todosLosProblemas].reverse().slice(0, 5);
 
-    return ultimos.map(p => ({
+    return ultimos.map((p) => ({
+      id: p.id,
       titulo: p.titulo,
       plataforma: p.plataforma,
-      estado: p.estado,
-      tiempo: p.estado === 'Resuelto' ? '¡Completado!' : 'Agregado'
+      accion: p.estado === 'Resuelto' ? 'Resuelto' : 'Agregado',
+      ubicacion: p.solved_location ?? null,
+      tiempo:
+        p.estado === 'Resuelto' && p.solved_at
+          ? this.formatDate(p.solved_at)
+          : p.estado === 'Resuelto'
+            ? '¡Completado!'
+            : 'Agregado',
     }));
   });
 
-  abrirRetosAleatorios() {
-    this.dialog.open<RetosAleatoriosDialog, void, ResultadoRetos>(RetosAleatoriosDialog, {
-      width: '420px', maxWidth: 'calc(100vw - 32px)',
-    }).afterClosed().subscribe(resultado => {
-      this.problems.reload();
-      if (resultado?.accion === 'agregar') this.openForm();
-      if (resultado?.accion === 'listas') void this.router.navigate(['/listas']);
-      if (resultado?.accion === 'resolver') this.openForm(resultado.problema, true);
+  formatDate(iso?: string | null): string {
+    if (!iso) return '';
+    const date = new Date(iso);
+    if (Number.isNaN(date.getTime())) return '';
+    return date.toLocaleString('es-CL', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
     });
+  }
+
+  abrirRetosAleatorios() {
+    this.dialog
+      .open<RetosAleatoriosDialog, void, ResultadoRetos>(RetosAleatoriosDialog, {
+        width: '420px',
+        maxWidth: 'calc(100vw - 32px)',
+      })
+      .afterClosed()
+      .subscribe((resultado) => {
+        this.problems.reload();
+        if (resultado?.accion === 'agregar') this.openForm();
+        if (resultado?.accion === 'listas') void this.router.navigate(['/listas']);
+        if (resultado?.accion === 'resolver') this.openForm(resultado.problema, true);
+      });
   }
 
   openForm(problem?: Problem, resolver = false) {
     const referencia = this.dialog.open(ProblemFormDialog, { data: problem ?? null });
-    // Se usa el formulario común de edición: aquí se integrará también el GPS.
-    if (resolver && problem) referencia.componentInstance.form.controls.estado.setValue('Resuelto');
-    referencia.afterClosed()
-      .subscribe((value?: ProblemInput) => {
-        if (!value) return;
-        const request$ = problem
-          ? this.service.update(problem.id, value)
-          : this.service.create(value);
-        request$.subscribe({
-          next: () => {
-            this.snack.open(problem ? 'Problema actualizado' : 'Problema agregado', 'OK', { duration: 3000 });
-            this.problems.reload();
-            this.tags.reload();
-          },
-          error: () => this.snack.open('Error al guardar', 'Cerrar', { duration: 4000 }),
-        });
+    if (resolver && problem) {
+      referencia.componentInstance.form.controls.estado.setValue('Resuelto');
+      referencia.componentInstance.onEstadoChange('Resuelto');
+    }
+    referencia.afterClosed().subscribe((value?: ProblemInput) => {
+      if (!value) return;
+      const request$ = problem
+        ? this.service.update(problem.id, value)
+        : this.service.create(value);
+      request$.subscribe({
+        next: () => {
+          this.snack.open(problem ? 'Problema actualizado' : 'Problema agregado', 'OK', { duration: 3000 });
+          this.problems.reload();
+          this.tags.reload();
+        },
+        error: () => this.snack.open('Error al guardar', 'Cerrar', { duration: 4000 }),
       });
+    });
   }
 
   remove(problem: Problem) {
