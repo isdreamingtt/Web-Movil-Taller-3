@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Response
 from sqlalchemy.orm import Session
@@ -10,7 +11,6 @@ from app.services.security import get_current_user
 router = APIRouter(prefix="/problems", tags=["problems"])
 
 
-#Verifica que el problema exista y pertenezca al usuario autenticado
 def get_own_problem(db: Session, problem_id: int, user: User) -> Problem:
     problem = db.get(Problem, problem_id)
     if not problem or problem.user_id != user.id:
@@ -18,7 +18,6 @@ def get_own_problem(db: Session, problem_id: int, user: User) -> Problem:
     return problem
 
 
-#Lista los problemas del usuario con filtros opcionales por plataforma, estado y tag
 @router.get("", response_model=list[ProblemOut])
 def list_problems(
     plataforma: Optional[str] = None,
@@ -37,7 +36,6 @@ def list_problems(
     return query.order_by(Problem.id.desc()).all()
 
 
-#Obtiene los tags únicos registrados por el usuario autenticado
 @router.get("/tags", response_model=list[str])
 def list_user_tags(
     db: Session = Depends(get_db),
@@ -50,6 +48,7 @@ def list_user_tags(
         .all()
     )
     return [r[0] for r in rows]
+
 
 @router.get("/{problem_id}", response_model=ProblemOut)
 def get_problem(
@@ -66,7 +65,10 @@ def create_problem(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    problem = Problem(**data.model_dump(), user_id=user.id)
+    payload = data.model_dump()
+    if payload.get("estado") == "Resuelto" and payload.get("solved_at") is None:
+        payload["solved_at"] = datetime.now(timezone.utc)
+    problem = Problem(**payload, user_id=user.id)
     db.add(problem)
     db.commit()
     db.refresh(problem)
@@ -81,7 +83,14 @@ def update_problem(
     user: User = Depends(get_current_user),
 ):
     problem = get_own_problem(db, problem_id, user)
-    for key, value in data.model_dump().items():
+    updates = data.model_dump(exclude_unset=True)
+    if (
+        updates.get("estado") == "Resuelto"
+        and "solved_at" not in updates
+        and problem.solved_at is None
+    ):
+        updates["solved_at"] = datetime.now(timezone.utc)
+    for key, value in updates.items():
         setattr(problem, key, value)
     db.commit()
     db.refresh(problem)

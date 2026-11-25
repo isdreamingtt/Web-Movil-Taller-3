@@ -3,9 +3,10 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import text
 
 from app.database.database import Base, engine
-from app.models import models  # noqa: F401  (registra las tablas)
+from app.models import models
 from app.routers import auth, problems, listas_entrenamiento
 
 DEFAULT_CORS_ORIGINS = (
@@ -16,9 +17,24 @@ DEFAULT_CORS_ORIGINS = (
 )
 
 
+def _ensure_problems_columns() -> None:
+    statements = [
+        "ALTER TABLE problems ADD COLUMN IF NOT EXISTS tag VARCHAR(50)",
+        "ALTER TABLE problems ADD COLUMN IF NOT EXISTS solved_lat DOUBLE PRECISION",
+        "ALTER TABLE problems ADD COLUMN IF NOT EXISTS solved_lng DOUBLE PRECISION",
+        "ALTER TABLE problems ADD COLUMN IF NOT EXISTS solved_location VARCHAR(150)",
+        "ALTER TABLE problems ADD COLUMN IF NOT EXISTS solved_at TIMESTAMPTZ",
+        "ALTER TABLE problems ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()",
+    ]
+    with engine.begin() as conn:
+        for stmt in statements:
+            conn.execute(text(stmt))
+
+
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     Base.metadata.create_all(bind=engine)
+    _ensure_problems_columns()
     yield
 
 

@@ -1,5 +1,6 @@
+from datetime import datetime
 from typing import Optional
-from sqlalchemy import String, ForeignKey
+from sqlalchemy import DateTime, Float, ForeignKey, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.database.database import Base
 
@@ -28,9 +29,19 @@ class Problem(Base):
     url: Mapped[Optional[str]] = mapped_column(String(300), nullable=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     tag: Mapped[Optional[str]] = mapped_column(String(50), index=True, nullable=True)
+    solved_lat: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    solved_lng: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    solved_location: Mapped[Optional[str]] = mapped_column(String(150), nullable=True)
+    solved_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
 
     owner: Mapped["User"] = relationship(back_populates="problems")
-    
+
+
 class ListaEntrenamiento(Base):
     __tablename__ = "listas_entrenamiento"
 
@@ -41,9 +52,11 @@ class ListaEntrenamiento(Base):
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
     propietario: Mapped["User"] = relationship()
     problemas: Mapped[list["ProblemaListaEntrenamiento"]] = relationship(
-        back_populates="lista_entrenamiento", cascade="all, delete-orphan",
+        back_populates="lista_entrenamiento",
+        cascade="all, delete-orphan",
         order_by="ProblemaListaEntrenamiento.id",
     )
+
 
 class ProblemaListaEntrenamiento(Base):
     __tablename__ = "problemas_lista_entrenamiento"
@@ -55,4 +68,6 @@ class ProblemaListaEntrenamiento(Base):
     dificultad: Mapped[Optional[int]] = mapped_column(nullable=True)
     url: Mapped[Optional[str]] = mapped_column(String(300), nullable=True)
     tag: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
-    lista_entrenamiento: Mapped["ListaEntrenamiento"] = relationship(back_populates="problemas")
+    lista_entrenamiento: Mapped["ListaEntrenamiento"] = relationship(
+        back_populates="problemas"
+    )
