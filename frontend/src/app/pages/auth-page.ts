@@ -19,7 +19,7 @@ import { AuthService } from '../services/auth.service';
     <main class="auth-layout">
       <aside class="welcome-panel" aria-label="Acerca de ICPC Tracker">
         <div class="welcome-brand">
-          <span class="welcome-brand-icon" aria-hidden="true">&lt;/&gt;</span>
+          <img class="welcome-brand-icon" src="/icpc-logo.png" alt="" aria-hidden="true" />
           <span>ICPC <strong>Tracker</strong></span>
         </div>
 

@@ -6,8 +6,8 @@
   font-weight: 750; letter-spacing: -.6px; color: #10234b; white-space: nowrap;
 }
 .site-brand strong {color: #075df0;}
-.site-brand-mark {width: 48px; height: 47px; display: grid; place-items: center; border-radius: 9px; color: white;
-  font-size: 20px; font-weight: 750; background: linear-gradient(145deg, #164977, #082b51); box-shadow: 0 3px 7px rgba(8, 34, 67, .16);
+.site-brand-mark {width: 48px; height: 48px; display: block; flex-shrink: 0; border-radius: 10px; object-fit: cover;
+  box-shadow: 0 3px 7px rgba(8, 34, 67, .18);
 }
 .spacer {flex: 1;}
 .site-nav {display: flex; align-items: center; gap: clamp(14px, 2.5vw, 42px);}
@@ -23,14 +23,14 @@
 @media (max-width: 600px) {
   .site-header { height: auto; min-height: 68px; padding: calc(10px + env(safe-area-inset-top, 0px)) 16px 10px; flex-wrap: wrap; }
   .site-brand { gap: 9px; font-size: 18px; }
-  .site-brand-mark { width: 36px; height: 36px; font-size: 15px; }
+  .site-brand-mark { width: 36px; height: 36px; border-radius: 8px; }
   .site-nav { gap: 12px; }
   .nav-link, .logout-link { font-size: 13px; }
   .user { display: none; }
 }
 @media (max-width: 370px) {
   .site-brand { font-size: 15px; }
-  .site-brand-mark { width: 32px; height: 32px; font-size: 14px; }
+  .site-brand-mark { width: 32px; height: 32px; border-radius: 8px; }
   .site-nav { gap: 9px; }
 }
 @media (max-width: 900px) {

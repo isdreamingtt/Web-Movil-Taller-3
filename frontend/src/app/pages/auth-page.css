@@ -24,7 +24,7 @@
 
 .welcome-brand, .welcome-intro, .features {position: relative; z-index: 1;}
 .welcome-brand {display: flex; align-items: center; gap: 20px; font-size: clamp(20px, 1.6vw, 26px); letter-spacing: -.4px;}
-.welcome-brand-icon {display: grid; place-items: center; width: 60px; height: 58px; border-radius: 14px; font-size: 24px; font-weight: 700; color: #f1faff; background: rgba(95, 158, 226, .4);}
+.welcome-brand-icon {display: block; flex-shrink: 0; width: 60px; height: 60px; border-radius: 14px; object-fit: cover; box-shadow: 0 4px 12px rgba(0, 0, 0, .28);}
 .welcome-eyebrow {margin: 0 0 22px; font-size: 14px; font-weight: 800; letter-spacing: 2px; color: #9bcaff;}
 .welcome-intro h2 {max-width: 600px; margin: 0 0 20px; font-size: clamp(37px, 3.2vw, 55px); line-height: 1.13; font-weight: 800; letter-spacing: -1.3px;}
 .welcome-intro h2 span {color: #39c7ff; background: linear-gradient(90deg, #13a7ef, #7ce6ff); -webkit-background-clip: text; background-clip: text;-webkit-text-fill-color: transparent;}
@@ -85,7 +85,7 @@
   :host { padding: 24px 16px 40px; }
   .auth-layout { grid-template-columns: 1fr; min-height: 0; border-radius: 24px; }
   .welcome-panel { padding: 30px 32px; gap: 24px; }
-  .welcome-brand-icon { width: 44px; height: 44px; font-size: 19px; }
+  .welcome-brand-icon { width: 44px; height: 44px; border-radius: 10px; }
   .welcome-brand { font-size: 20px; }
   .welcome-eyebrow { margin-bottom: 10px; font-size: 11px; }
   .welcome-intro h2 { max-width: 500px; margin-bottom: 10px; font-size: 30px; }

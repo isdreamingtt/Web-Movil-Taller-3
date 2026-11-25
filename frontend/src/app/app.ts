@@ -11,7 +11,7 @@ import { AuthService } from './services/auth.service';
   template: `
     <mat-toolbar class="site-header">
       <a class="site-brand" routerLink="/" aria-label="ICPC Tracker, inicio">
-        <span class="site-brand-mark" aria-hidden="true">&lt;/&gt;</span>
+        <img class="site-brand-mark" src="/icpc-logo.png" alt="" aria-hidden="true" />
         <span>ICPC <strong>Tracker</strong></span>
       </a>
       <span class="spacer"></span>
