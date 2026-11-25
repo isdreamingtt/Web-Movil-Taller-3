@@ -2,9 +2,7 @@
 
 **Taller 03 — Introducción al Desarrollo Web/Móvil**
 
-ICPC Tracker es una aplicación web *full stack* para llevar un registro personal de problemas de programación competitiva de plataformas como Codeforces, LeetCode y CSES. Permite organizar los problemas registrados, consultar su estado y visualizar un resumen del progreso.
-
-El proyecto separa el frontend desarrollado con Angular del backend construido con FastAPI. Ambos se comunican mediante una API REST, mientras que PostgreSQL almacena la información de forma persistente.
+ICPC Tracker es una aplicación web y móvil para registrar problemas de programación competitiva de plataformas como Codeforces, LeetCode y CSES, organizar su estado y visualizar el progreso personal. La versión móvil integra Angular con Capacitor para su ejecución en dispositivos Android.
 
 ## Integrantes
 
@@ -15,198 +13,190 @@ El proyecto separa el frontend desarrollado con Angular del backend construido c
 
 ## Funcionalidades
 
-- Registro e inicio de sesión de usuarios mediante autenticación JWT.
-- Gestión de problemas: crear, consultar, editar y eliminar registros.
-- Filtrado de problemas por plataforma y estado.
-- Visualización de estadísticas sobre los problemas registrados.
-- Acceso a funcionalidades protegidas mediante autenticación.
+- Registro e inicio de sesión de usuarios.
+- Gestión, filtrado y estadísticas de problemas de programación competitiva.
+- Creación y uso compartido de listas de entrenamiento mediante códigos QR, con escaneo e importación de problemas desde Android.
+- Registro de la ubicación mediante GPS al marcar un problema como resuelto.
+- Selección de retos aleatorios al agitar el dispositivo mediante el acelerómetro.
 
 ## Tecnologías
 
 | Capa | Tecnologías |
 | --- | --- |
-| Frontend | Angular, Angular Material, TypeScript |
-| Backend | Python, FastAPI |
+| Frontend | Angular 22, Angular Material, TypeScript |
+| Aplicación móvil | Capacitor 8, Android, Java |
+| Capacidades móviles | ZXing, Capacitor Geolocation, Capacitor Motion |
+| Backend | Python, FastAPI, SQLAlchemy, JWT |
 | Base de datos | PostgreSQL |
-| Persistencia | SQLAlchemy (ORM) |
-| Autenticación | JWT y bcrypt para el hash de contraseñas |
-
-## Estructura del proyecto
-
-```text
-WebMovil-Taller-3/
-├── backend/
-│   ├── app/
-│   │   ├── main.py
-│   │   ├── database/
-│   │   ├── models/
-│   │   ├── schemas/
-│   │   ├── services/
-│   │   └── routers/
-│   ├── requirements.txt
-│   └── .env.example
-├── frontend/
-│   └── src/
-│       └── app/
-│           ├── components/
-│           ├── pages/
-│           ├── services/
-│           ├── guards/
-│           ├── interceptors/
-│           └── models/
-└── README.md
-```
+| Construcción automatizada | Gradle, GitHub Actions |
 
 ## Requisitos previos
 
-Antes de ejecutar el proyecto, instala las siguientes herramientas:
-
 - [Git](https://git-scm.com/).
-- [Python](https://www.python.org/downloads/) 3.10 o superior.
-- [PostgreSQL](https://www.postgresql.org/download/) 14 o superior.
-- [Node.js](https://nodejs.org/) 22.12 o una versión compatible con el Angular del proyecto (incluye npm).
+- [Node.js](https://nodejs.org/) 24.15.0 o superior dentro de la rama 24.x (incluye npm).
+- [JDK 21](https://adoptium.net/temurin/releases/?version=21).
+- [Android Studio](https://developer.android.com/studio) con Android SDK Platform 36, SDK Build-Tools y Platform-Tools.
+- Dispositivo con Android 7.0 (API 24) o superior y conexión a Internet.
 
-No es necesario instalar Angular CLI de forma global: se puede ejecutar la versión del proyecto mediante `npx`.
+Para ejecutar el backend localmente también se requiere Python 3.12 y PostgreSQL.
 
-## Instalación y ejecución
-
-### 1. Obtener el proyecto
-
-Reemplaza `URL_DEL_REPOSITORIO` por la dirección de GitHub y clona el proyecto:
+## 1. Obtener el proyecto
 
 ```bash
 git clone URL_DEL_REPOSITORIO
-cd WebMovil-Taller2
+cd Web-Movil-Taller-3
 ```
 
-Si ya tienes el proyecto descargado, abre una terminal en su directorio raíz y continúa con el siguiente paso.
+Reemplazar `URL_DEL_REPOSITORIO` por la dirección del repositorio. Si se descargó como ZIP, extraerlo y abrir la carpeta raíz.
 
-### 2. Configurar la base de datos
+## 2. Construir la aplicación Android
 
-Asegúrate de que PostgreSQL esté en ejecución. Abre **SQL Shell (psql)** o conéctate mediante:
+Desde la raíz del proyecto:
 
 ```bash
-psql -U postgres
+cd frontend
+npm ci
+npm run build:prod
+npx cap sync android
 ```
 
-Crea la base de datos:
+El build de producción de Angular se genera en `frontend/dist/frontend/browser/`. Capacitor copia estos archivos y sincroniza las dependencias con el proyecto nativo ubicado en `frontend/android/`.
+
+La aplicación utiliza la API de producción configurada en `frontend/src/environments/environment.prod.ts`:
+
+<https://web-movil-taller-3-production.up.railway.app>
+
+No es necesario ejecutar el backend local para utilizar la aplicación Android mientras este servicio esté disponible. Su estado puede consultarse en [/health](https://web-movil-taller-3-production.up.railway.app/health).
+
+## 3. Ejecutar en un dispositivo Android
+
+Desde la carpeta `frontend`, abrir el proyecto nativo:
+
+```bash
+npm run cap:open
+```
+
+1. Completar la sincronización de Gradle en Android Studio y configurar JDK 21 como Gradle JDK.
+2. En el teléfono, habilitar las opciones de desarrollador pulsando siete veces sobre el número de compilación en Ajustes y activar la depuración USB.
+3. Conectar el dispositivo al computador mediante USB y aceptar la autorización de depuración.
+4. Seleccionar el dispositivo y la configuración `app` en Android Studio, y pulsar **Run**.
+
+Después de modificar el frontend, ejecutar `npm run cap:sync` desde `frontend` para reconstruir y sincronizar la aplicación antes de ejecutarla nuevamente.
+
+## 4. Generar el APK
+
+Después de completar la construcción del frontend y la sincronización con Capacitor, acceder a `frontend/android` desde la carpeta `frontend`:
+
+```bash
+cd android
+```
+
+**Windows (PowerShell):**
+
+```powershell
+.\gradlew.bat assembleDebug
+```
+
+**Linux/macOS:**
+
+```bash
+chmod +x gradlew
+./gradlew assembleDebug
+```
+
+Si se compila desde la terminal, configurar `JAVA_HOME` para JDK 21 y `ANDROID_HOME` con la ruta del SDK de Android, si aún no están configurados.
+
+El APK generado se encuentra en la siguiente ruta, relativa a la raíz del repositorio:
+
+```text
+frontend/android/app/build/outputs/apk/debug/app-debug.apk
+```
+
+## 5. Construcción automatizada con GitHub Actions
+
+El workflow `.github/workflows/android-build.yml` se ejecuta automáticamente ante cambios en la rama `main` y también puede ejecutarse manualmente. Realiza el build de producción de Angular, sincroniza Capacitor, compila Android mediante Gradle y publica el APK debug como artefacto.
+
+Para obtener el APK desde GitHub:
+
+1. Acceder a la pestaña **Actions** del repositorio.
+2. Seleccionar el workflow **Build Android APK**.
+3. Abrir una ejecución exitosa o iniciar una nueva mediante **Run workflow**.
+4. Descargar el artefacto `icpc-tracker-debug-apk` desde **Artifacts** y extraer el archivo `app-debug.apk`.
+
+## 6. Instalar el APK en Android
+
+1. Transferir el archivo `app-debug.apk` al dispositivo Android.
+2. Abrir el archivo desde el administrador de archivos y autorizar la instalación desde esa fuente si Android lo solicita.
+3. Instalar y abrir **ICPC Tracker**.
+
+La aplicación requiere conexión a Internet para comunicarse con el backend. Los permisos de cámara y ubicación se solicitan al utilizar las funcionalidades correspondientes.
+
+## 7. Ejecutar la aplicación web localmente (Opcional)
+
+### Base de datos
+
+Iniciar PostgreSQL, conectarse mediante `psql -U postgres` y crear la base de datos:
 
 ```sql
 CREATE DATABASE tracker;
 ```
 
-Las tablas `users` y `problems` se crean automáticamente al iniciar el backend.
+### Backend
 
-### 3. Configurar y ejecutar el backend
-
-Desde la raíz del proyecto:
+Desde la raíz del repositorio:
 
 ```bash
 cd backend
 python -m venv venv
 ```
 
-Activa el entorno virtual según tu sistema operativo:
-
 **Windows (PowerShell):**
 
 ```powershell
-venv\Scripts\Activate.ps1
-```
-
-**Linux/macOS:**
-
-```bash
-source venv/bin/activate
-```
-
-Instala las dependencias:
-
-```bash
-python -m pip install -r requirements.txt
-```
-
-Copia el archivo de ejemplo para crear `backend/.env`:
-
-**Windows (PowerShell):**
-
-```powershell
+.\venv\Scripts\Activate.ps1
 Copy-Item .env.example .env
 ```
 
 **Linux/macOS:**
 
 ```bash
+source venv/bin/activate
 cp .env.example .env
 ```
 
-Configura las variables de entorno en el archivo `.env`:
+Instalar las dependencias:
+
+```bash
+python -m pip install -r requirements.txt
+```
+
+Editar el archivo `backend/.env`, reemplazando la contraseña de PostgreSQL y el secreto JWT por valores propios:
 
 ```dotenv
 DATABASE_URL=postgresql+psycopg2://postgres:TU_PASSWORD@localhost:5432/tracker
 JWT_SECRET=TU_SECRETO_ALEATORIO
 JWT_EXPIRE_MINUTES=60
+CORS_ORIGINS=http://localhost:4200,https://localhost,http://localhost,capacitor://localhost
 ```
 
-- `DATABASE_URL`: conexión a PostgreSQL. Reemplaza `TU_PASSWORD` por tu contraseña local; si contiene caracteres especiales, codifícalos para usarlos en una URL.
-- `JWT_SECRET`: clave secreta utilizada para firmar los tokens JWT. Genera una clave aleatoria con el siguiente comando:
+El secreto JWT puede generarse con `python -c "import secrets; print(secrets.token_hex(32))"`.
 
-  ```bash
-  python -c "import secrets; print(secrets.token_hex(32))"
-  ```
-
-- `JWT_EXPIRE_MINUTES`: tiempo de vigencia del token, expresado en minutos.
-
-Inicia el servidor desde la carpeta `backend`:
+Iniciar el backend desde `backend/`:
 
 ```bash
 uvicorn app.main:app --reload
 ```
 
-### 4. Configurar y ejecutar el frontend
+Las tablas se crean automáticamente al iniciar el servidor. La documentación de la API está disponible en <http://localhost:8000/docs>.
 
-Abre **otra terminal** y, desde la raíz del proyecto, ejecuta:
+### Frontend
+
+En otra terminal, desde la raíz del repositorio:
 
 ```bash
 cd frontend
-npm install
-npx ng serve
+npm ci
+npm start
 ```
 
-Abre la aplicación en **http://localhost:4200**. Para utilizarla, mantén en ejecución tanto el frontend como el backend.
-
-## Uso de la aplicación
-
-1. Ingresa a `http://localhost:4200` y registra una cuenta.
-2. Inicia sesión con tus credenciales.
-3. En la sección **Problemas**: agrega, consulta, edita o elimina registros. También puedes filtrarlos por plataforma y estado.
-4. En **Estadísticas**: consulta el resumen de tus problemas registrados.
-
-## API REST
-
-Los siguientes son los endpoints principales descritos para el backend:
-
-| Método | Endpoint | Descripción | Autenticación |
-| --- | --- | --- | --- |
-| `POST` | `/auth/register` | Registrar un usuario | No |
-| `POST` | `/auth/login` | Iniciar sesión y obtener un JWT | No |
-| `GET` | `/problems` | Listar problemas y aplicar filtros | Sí |
-| `GET` | `/problems/{id}` | Consultar un problema | Sí |
-| `POST` | `/problems` | Registrar un problema | Sí |
-| `PUT` | `/problems/{id}` | Actualizar un problema | Sí |
-| `DELETE` | `/problems/{id}` | Eliminar un problema | Sí |
-
-## Problemas frecuentes
-
-| Problema | Qué revisar |
-| --- | --- |
-| `password authentication failed` | Comprueba el usuario y la contraseña de `DATABASE_URL`. |
-| `database "tracker" does not exist` | Crea la base de datos indicada en el paso 2. |
-| `psql` no se reconoce | Abre SQL Shell (psql) o agrega PostgreSQL al `PATH`. |
-| `ng` no se reconoce | Ejecuta `npm install` en `frontend` y utiliza `npx ng serve`. |
-| Error de CORS o conexión a la API | Comprueba que FastAPI esté en el puerto 8000 y que la configuración de comunicación con Angular sea correcta. |
-| `La ejecución de scripts está deshabilitada en este sistema` | Ejecuta `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass` y vuelve a activar el entorno con `.\venv\Scripts\Activate.ps1`. |
-
-## Seguridad
-
-No subas al repositorio archivos `.env`, contraseñas reales, secretos JWT ni otras credenciales. Para compartir la configuración necesaria, utiliza únicamente `backend/.env.example` con valores de ejemplo.
+Para ejecutar la versión web conectada a la API de producción, utilizar `npx ng serve --configuration production` en lugar de `npm start`.
